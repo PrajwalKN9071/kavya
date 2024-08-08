@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<myFields>
+	<requester_info>
+		<name>Lykke Thingmann Stead</name>
+		<email>Lykke.Thingmann.Stead@consult.nordea.com</email>
+		<phone>+45 23230888</phone>
+		<project>cbc-service-cbc-osb</project>
+		<syscode>CBC</syscode>
+		<env_type>dev</env_type>
+		<env>dev01</env>
+		<date>Status retired at 2018-12-03 14:32 by user for ninja config updates (admin)</date>
+		<comments>CBC development - !!! Maintained through Config as Code !!!</comments>
+		<rsl>standard</rsl>
+		<sup_grp>NINJA Operations</sup_grp>
+		<hist>150</hist>
+		<sec_base>false</sec_base>
+	</requester_info>
+	<infrastructure>
+		<environment>
+			<domain_name>cbc-service-cbc-osb-dev01</domain_name>
+			<parent_name>cbc-osb-dev01</parent_name>
+			<jvm_default_opts>-Doracle.jdbc.fanEnabled=false -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Xloggc:${logDir}/%server%/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=10M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${logDir}/%server%</jvm_default_opts>
+			<jvm_debug_opts>-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%debugPort%,server=y,suspend=n</jvm_debug_opts>
+			<domain_template>/common/templates/wls/wls.jar</domain_template>
+			<log_root>F:\logs</log_root>
+			<domain_root>E:\domains</domain_root>
+			<app_root>E:\applications</app_root>
+			<nm_port>6010</nm_port>
+			<nm_domain>true</nm_domain>
+			<pfrm_vrs>osb-service-12.2.1-windows</pfrm_vrs>
+			<soa_service>false</soa_service>
+			<service_type>soa-service</service_type>
+		</environment>
+		<vm_servers>
+			<vm_server>
+				<id>vda1cs8138</id>
+				<vm_type>virtual</vm_type>
+				<vm_os>Windows Server 2019</vm_os>
+				<vm_ram>50</vm_ram>
+				<nw_suffix>qaoneadr.local</nw_suffix>
+				<usage>primary</usage>
+			</vm_server>
+		</vm_servers>
+		<servers/>
+		<proxies/>
+		<logging>
+			<s_log4j>false</s_log4j>
+			<s_server>Info</s_server>
+			<s_log_rotation>bySize</s_log_rotation>
+			<s_log_limit>5000</s_log_limit>
+			<s_audit>log</s_audit>
+			<s_datasource>false</s_datasource>
+			<s_logi>false</s_logi>
+		</logging>
+		<jvm>
+			<jvm_vendor>Sun</jvm_vendor>
+			<jvm_options>-Xmx2g</jvm_options>
+		</jvm>
+		<appdynamics/>
+	</infrastructure>
+	<resources>
+		<files>
+			<file>
+				<name>wlst-soa.cmd</name>
+				<source>wlst-soa.cmd</source>
+				<target>wlst-soa.cmd</target>
+				<filtering>none</filtering>
+				<desc>SOA suite set environment</desc>
+				<type>text</type>
+				<seq>1</seq>
+				<content>set ORACLE_HOME=%MW_HOME%\osb&#13;set OSB_SERVICE_DEPLOY=1</content>
+			</file>
+			<file>
+				<name>JSONFileWriter_file.jca</name>
+				<source>upload/JSONFileWriter_file.jca</source>
+				<target>etc/JSONFileWriter_file.jca</target>
+				<filtering>filtering</filtering>
+				<desc>CBC_BAM Binding file to write to file</desc>
+				<type>text</type>
+				<content>
+                  &lt;con:jcaEntry xmlns:con="http://www.bea.com/wli/sb/resources/config"&gt;
+                  &lt;con:jca&gt;&lt;![CDATA[ 
+                      &lt;adapter-config name="JSONFileWriter" adapter="file" wsdlLocation="JSONFileWriter.wsdl" xmlns="http://platform.integration.oracle/blocks/adapter/fw/metadata"&gt;&#13;
+                        &#13;
+                        &lt;connection-factory location="eis/FileAdapter"/&gt;&#13;
+                        &lt;endpoint-interaction portType="Write_ptt" operation="Write"&gt;&#13;
+                          &lt;interaction-spec className="oracle.tip.adapter.file.outbound.FileInteractionSpec"&gt;&#13;
+                            &lt;property name="PhysicalDirectory" value="F:\Logs"/&gt;&#13;
+                            &lt;property name="Append" value="true"/&gt;&#13;
+                            &lt;property name="FileNamingConvention" value="%yyyyMMddHH%-CBCBAMData.json"/&gt;&#13;
+                          &lt;/interaction-spec&gt;&#13;
+                        &lt;/endpoint-interaction&gt;&#13;
+                      &#13;
+                      &lt;/adapter-config&gt;]]&gt;&lt;/con:jca&gt;
+                  &lt;con:jcaDependency&gt;
+                      &lt;con:wsdlRef wsdlLocation="../Resources/JSONFileWriter.wsdl" ref="CBC_BAM_v1.0/Resources/JSONFileWriter"/&gt;
+                  &lt;/con:jcaDependency&gt;
+                  &lt;/con:jcaEntry&gt;
+				</content>
+				<seq>3</seq>
+			</file>
+		</files>
+		<datasources/>
+		<collections>
+			<collection>
+				<type>SharedFiles</type>
+				<values>
+					<value>
+						<name>etc/${env}/cbc-osb-${env}.xml</name>
+					</value>
+				</values>
+			</collection>
+		</collections>
+		<properties>
+			<property>
+				<name>CBC_KAFKA_ENV_INFIX</name>
+				<value>DEV</value>
+				<encoded>false</encoded>
+				<desc>Env shortcut name used for infixes</desc>
+				<seq>4</seq>
+			</property>
+			<property>
+				<name>CBC_MQ_ENV_INFIX</name>
+				<value/>
+				<encoded>false</encoded>
+				<desc>Env shortcut name used for infixes</desc>
+				<seq>5</seq>
+			</property>
+			<property>
+				<name>CBC_Q_ENV_INFIX</name>
+				<value/>
+				<encoded>false</encoded>
+				<desc>Infix in queues</desc>
+				<seq>6</seq>
+			</property>
+			<property>
+				<name>CBC_T_ENV_INFIX</name>
+				<value>${CBC_T_SEPARATOR}${CBC_KAFKA_ENV_INFIX}</value>
+				<encoded>false</encoded>
+				<desc>Infix in topics</desc>
+				<seq>7</seq>
+			</property>
+			<property>
+				<name>CBC_NCore_MQ_CBC_CreateBooking_MQConnectionList</name>
+				<value>is-mqds11c.oneadr.net:1414,is-mqds12c.oneadr.net:1414</value>
+				<encoded>false</encoded>
+				<seq>16</seq>
+			</property>
+			<property>
+				<name>CBC_NCore_MQ_CBC_Reservation_MQConnectionList</name>
+				<value>is-mqds11c.oneadr.net:1414,is-mqds12c.oneadr.net:1414</value>
+				<encoded>false</encoded>
+				<seq>25</seq>
+			</property>
+			<property>
+				<name>CBC_NCore_MQ_CBC_Validation_MQConnectionList</name>
+				<value>is-mqds11c.oneadr.net:1414,is-mqds12c.oneadr.net:1414</value>
+				<encoded>false</encoded>
+				<seq>34</seq>
+			</property>
+			<property>
+				<name>CBC_Legacy_MQ_CBC_Common_MQConnectionList</name>
+				<value>is-mqds11c.oneadr.net:1414,is-mqds12c.oneadr.net:1414</value>
+				<encoded>false</encoded>
+				<seq>16</seq>
+			</property>
+			<property>
+				<name>CBC_NCore_Q_Validation_CBC2SOURCE.COVER.CRTL.REP</name>
+				<value>*</value>
+				<encoded>false</encoded>
+				<desc>Created from CBC_Validation_NCore_v1.0.zip</desc>
+				<seq>37</seq>
+			</property>
+			<property>
+				<name>CBC_CatFlap_Q_CreateBooking_CBC2SOURCE.BOOKING.REP</name>
+				<value>*</value>
+				<encoded>false</encoded>
+				<desc>CatFlap booking failure queue</desc>
+				<seq>55</seq>
+			</property>
+			<property>
+				<name>CBC_CatFlap_Q_Reservation_CBC2SOURCE.RESERVATION.REP</name>
+				<value>*</value>
+				<encoded>false</encoded>
+				<desc>CatFlap reservation failure queue</desc>
+				<seq>56</seq>
+			</property>
+			<property>
+				<name>CBC_CatFlap_Q_Validation_CBC2SOURCE.COVER.CTRL.REP</name>
+				<value>*</value>
+				<encoded>false</encoded>
+				<desc>CatFlap validation failure queue</desc>
+				<seq>57</seq>
+			</property>
+			<property>
+				<name>CBC_CatFlap_MQ_CBC_All_MQConnectionList</name>
+				<value>is-mqds11c.oneadr.net:1414,is-mqds12c.oneadr.net:1414</value>
+				<encoded>false</encoded>
+				<seq>62</seq>
+			</property>
+			<property>
+				<name>CBC_NCore_NordeaIrisCore_Rest_Endpoint</name>
+				<value>https://cba-publisher.dev01.qaoneadr.local/NordeaPublisher/api</value>
+				<encoded>false</encoded>
+				<desc>IRIS base URL</desc>
+				<seq>145</seq>
+			</property>
+			<property>
+				<name>CBC_IRIS_ProviderUrl</name>
+				<value>https://cba-nordea-provider.dev01.qaoneadr.local/NordeaProvider</value>
+				<encoded>false</encoded>
+				<seq>146</seq>
+			</property>
+		</properties>
+	</resources>
+	<security>
+		<users>
+			<user>
+				<user_name>deployer</user_name>
+				<user_password>[ENCODED:20583612559:{AES}UWCpnnDUEQT+9TvFuWXkuYm9sVbf5nwY9bMMPaqCs9o=]</user_password>
+				<user_role>Other</user_role>
+				<user_pw_compl>true</user_pw_compl>
+				<seq>8</seq>
+			</user>
+			<user>
+				<user_name>admin</user_name>
+				<user_password>[ENCODED:20583612559:{AES}b239spQ4qF8USEV7aRF3Eg==]</user_password>
+				<user_role>Other</user_role>
+				<user_pw_compl>true</user_pw_compl>
+				<desc>user for ninja config updates</desc>
+				<seq>9</seq>
+			</user>
+		</users>
+		<authenticators/>
+		<roles/>
+		<groups/>
+		<keystores/>
+		<certificates/>
+	</security>
+	<deployments>
+	</deployments>
+</myFields>
